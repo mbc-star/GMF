@@ -206,21 +206,21 @@
 
 <header class="app-header">
 <div style="display: flex; align-items: center; gap: 16px;">
-    <img src="https://www.weadvocacy.fr/wp-content/uploads/2025/07/we_advocacy-logo_RVB.png" 
+    <img src="https://www.weadvocacy.fr/wp-content/uploads/2026/07/we_advocacy-logo_RVB.png" 
          alt="We Advocacy Logo" 
-         style="height: 40px; width: auto; filter: brightness(0) invert(1);"> 
+         style="height: 40px; width: auto; filter: brightness(0) invert(0);"> 
     <h1 style="font-size: 1.25rem; font-weight: 600; letter-spacing: -0.025em;">
       Employee Engagement Dashboard
     </h1>
   </div>
   <div class="header-controls">
     <select class="month-selector" id="monthSelector" onchange="updateMonth(this.value)">
-      <option value="Jan">January 2025</option>
-      <option value="Feb">February 2025</option>
-      <option value="Mar">March 2025</option>
-      <option value="Apr">April 2025</option>
-      <option value="May" selected>May 2025</option>
-      <option value="Jun">June 2025</option>
+      <option value="Jan">January 2026</option>
+      <option value="Feb">February 2026</option>
+      <option value="Mar">March 2026</option>
+      <option value="Apr">April 2026</option>
+      <option value="May" selected>May 2026</option>
+      <option value="Jun">June 2026</option>
     </select>
     <button class="btn-export" onclick="exportPDF()">⬇ Export PDF</button>
   </div>
@@ -241,7 +241,7 @@
   <div id="tab-overview" class="tab-panel active">
     <div class="section-header">
       <div>
-        <div class="section-title">Monthly Executive Report — May 2025</div>
+        <div class="section-title">Monthly Executive Report — May 2026</div>
         <div class="section-subtitle">Comprehensive employee engagement analysis across all communication channels</div>
       </div>
       <span class="section-badge">Monthly Synthesis</span>
@@ -313,7 +313,7 @@
       <div class="card">
         <div class="section-header" style="margin-bottom:16px">
           <div class="card-title" style="margin-bottom:0">EEI Trend — 6 Months</div>
-          <span style="font-size:11px;color:var(--text-muted)">Jan–Jun 2025</span>
+          <span style="font-size:11px;color:var(--text-muted)">Jan–Jun 2026</span>
         </div>
         <svg class="trend-chart" viewBox="0 0 500 140" id="trendChart"></svg>
         <div style="display:flex;justify-content:space-around;margin-top:8px">
@@ -354,14 +354,14 @@
 
     <!-- Channel overview quick -->
     <div class="card" style="margin-bottom:24px">
-      <div class="card-title" style="margin-bottom:18px">Channel Performance Summary — May 2025</div>
+      <div class="card-title" style="margin-bottom:18px">Channel Performance Summary — May 2026</div>
       <div class="bar-chart" id="channelSummaryBars"></div>
     </div>
 
     <!-- Benchmarks -->
     <div class="card">
       <div class="section-header" style="margin-bottom:16px">
-        <div class="card-title" style="margin-bottom:0">Industry Benchmarks — Internal Email Open Rates 2024–2025</div>
+        <div class="card-title" style="margin-bottom:0">Industry Benchmarks — Internal Email Open Rates 2024–2026</div>
         <span style="font-size:11px;color:var(--text-muted)">Your performance vs. sector average</span>
       </div>
       <div id="benchmarkBars"></div>
@@ -1251,7 +1251,7 @@ function drawVolumeEngagementChart() {
 // ==========================================
 function drawContentTables() {
   const top = [
-    { title: 'CEO Vision 2025 Message', type: 'Leadership', channel: 'Email', ctr: '12.4%', delta: 'up' },
+    { title: 'CEO Vision 2026 Message', type: 'Leadership', channel: 'Email', ctr: '12.4%', delta: 'up' },
     { title: 'Summer Party Save the Date', type: 'HR / Events', channel: 'Mobile Push', ctr: '11.8%', delta: 'up' },
     { title: 'New Benefits Package', type: 'HR / Benefits', channel: 'Email', ctr: '10.2%', delta: 'up' },
     { title: 'Safety Reminder — Factory', type: 'IT / Safety', channel: 'Popup PC', ctr: '9.8%', delta: 'neutral' },
