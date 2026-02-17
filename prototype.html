@@ -25,18 +25,18 @@
   }
 
   .app-header {
-    background: linear-gradient(135deg, #1a1d2e 0%, #2d3061 100%);
-    color: white;
-    padding: 0 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-  }
+  background: linear-gradient(135deg, #2d3061 0%, #4f46e5 100%); /* Bleu plus clair et vibrant */
+  color: white;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
   .app-header .logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
   .app-header .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
   .header-controls { display: flex; align-items: center; gap: 16px; }
@@ -205,13 +205,15 @@
 <body>
 
 <header class="app-header">
-<div style="display: flex; align-items: center; gap: 16px;">
-    <img src="https://www.weadvocacy.fr/wp-content/uploads/2025/07/we_advocacy-logo_RVB.png" 
-         alt="We Advocacy Logo" 
-         style="height: 45px; width: auto; filter: brightness(100) invert(0);"> 
-    <h1 style="font-size: 1.25rem; font-weight: 600; letter-spacing: -0.025em;">
-      Employee Engagement Dashboard
-    </h1>
+<div class="logo">
+    <div style="background: white; padding: 5px; border-radius: 6px; display: flex; align-items: center; justify-content: center; height: 40px; margin-right: 12px;">
+      <img src="https://www.weadvocacy.fr/wp-content/uploads/2025/07/we_advocacy-logo_RVB.png" 
+           alt="We Advocacy" 
+           style="height: 30px; width: auto;">
+    </div>
+    <span>We Advocacy</span>
+    <span style="font-weight:300;opacity:0.5;margin:0 6px">|</span>
+    <span style="font-size:13px;font-weight:400;opacity:0.7">Engagement Dashboard</span>
   </div>
   <div class="header-controls">
     <select class="month-selector" id="monthSelector" onchange="updateMonth(this.value)">
