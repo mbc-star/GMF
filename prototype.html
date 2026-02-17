@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>We Advocacy – Employee Engagement Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f2f7; color: #1a1d2e; }
+
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #ede9fe;
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --neutral: #6b7280;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text-muted: #6b7280;
+    --text-secondary: #374151;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, #1a1d2e 0%, #2d3061 100%);
+    color: white;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .app-header .logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
+  .app-header .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .header-controls { display: flex; align-items: center; gap: 16px; }
+  .month-selector { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 14px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+  .month-selector option { background: #2d3061; }
+  .btn-export { background: var(--primary); color: white; border: none; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+  .btn-export:hover { background: #3730a3; }
+
+  .nav-tabs { background: white; border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; gap: 4px; }
+  .nav-tab { padding: 14px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+  .nav-tab:hover { color: var(--primary); }
+  .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+  .main-content { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Cards */
+  .card { background: var(--card); border-radius: 16px; padding: 24px; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .card-value { font-size: 36px; font-weight: 700; color: #1a1d2e; line-height: 1; }
+  .card-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .delta { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: 8px; }
+  .delta.up { background: var(--success-light); color: var(--success); }
+  .delta.down { background: var(--danger-light); color: var(--danger); }
+  .delta.neutral { background: #f3f4f6; color: var(--neutral); }
+
+  /* Grid layouts */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 24px; }
+
+  /* Gauge */
+  .gauge-wrap { display: flex; flex-direction: column; align-items: center; padding: 8px 0; }
+  .gauge-svg { width: 140px; height: 80px; }
+  .gauge-label { font-size: 22px; font-weight: 700; margin-top: -8px; }
+  .gauge-sublabel { font-size: 11px; color: var(--text-muted); }
+
+  /* Bar chart */
+  .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 100px; font-size: 12px; font-weight: 500; color: var(--text-secondary); text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; background: #f3f4f6; border-radius: 6px; height: 28px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 600; color: white; transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+  .bar-pct { width: 44px; font-size: 12px; font-weight: 700; color: var(--text-secondary); flex-shrink: 0; }
+
+  /* Sentiment donut */
+  .sentiment-wrap { display: flex; align-items: center; gap: 24px; }
+  .donut-svg { width: 160px; height: 160px; flex-shrink: 0; }
+  .sentiment-legend { display: flex; flex-direction: column; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { color: var(--text-secondary); }
+  .legend-val { font-weight: 700; margin-left: auto; padding-left: 12px; }
+
+  /* eNPS gauge big */
+  .enps-display { text-align: center; padding: 16px 0; }
+  .enps-score { font-size: 64px; font-weight: 800; line-height: 1; }
+  .enps-track { height: 12px; background: linear-gradient(to right, #ef4444, #f59e0b, #10b981); border-radius: 6px; margin: 12px 0 6px; position: relative; }
+  .enps-needle { position: absolute; top: -4px; width: 4px; height: 20px; background: #1a1d2e; border-radius: 2px; transform: translateX(-50%); transition: left 1s ease; }
+  .enps-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+
+  /* Channel performance cards */
+  .channel-card { border-radius: 12px; padding: 18px 20px; position: relative; overflow: hidden; }
+  .channel-card .ch-icon { font-size: 28px; margin-bottom: 10px; }
+  .channel-card .ch-name { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; }
+  .channel-card .ch-metric { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .channel-card .ch-metric-label { font-size: 11px; color: var(--text-muted); }
+  .channel-card .ch-metric-val { font-size: 14px; font-weight: 700; }
+  .ch-bg { position: absolute; right: -20px; top: -20px; font-size: 100px; opacity: 0.05; pointer-events: none; }
+  .ch-email { background: #eff6ff; border: 1px solid #bfdbfe; }
+  .ch-sms { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .ch-popup { background: #faf5ff; border: 1px solid #ddd6fe; }
+  .ch-push { background: #fff7ed; border: 1px solid #fed7aa; }
+
+  /* Mini progress */
+  .mini-bar { height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .mini-bar-fill { height: 100%; border-radius: 3px; }
+
+  /* Table */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { background: #f9fafb; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: #f9fafb; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-up { background: var(--success-light); color: var(--success); }
+  .badge-down { background: var(--danger-light); color: var(--danger); }
+  .badge-neutral { background: #f3f4f6; color: var(--neutral); }
+  .badge-type { background: var(--primary-light); color: var(--primary); }
+
+  /* Heatmap */
+  .heatmap-grid { display: grid; grid-template-columns: 120px repeat(4, 1fr); gap: 4px; }
+  .heatmap-header { font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: center; padding: 6px 4px; }
+  .heatmap-row-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; }
+  .heatmap-cell { height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: transform 0.15s; }
+  .heatmap-cell:hover { transform: scale(1.05); }
+
+  /* Sparkline */
+  .sparkline-wrap { position: relative; }
+
+  /* Section header */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .section-title { font-size: 18px; font-weight: 700; color: #1a1d2e; }
+  .section-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .section-badge { background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+
+  /* Alert box */
+  .alert-box { border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: flex; gap: 12px; align-items: flex-start; }
+  .alert-box.warning { background: var(--warning-light); border-left: 4px solid var(--warning); }
+  .alert-box.success { background: var(--success-light); border-left: 4px solid var(--success); }
+  .alert-box.danger { background: var(--danger-light); border-left: 4px solid var(--danger); }
+  .alert-box.info { background: var(--primary-light); border-left: 4px solid var(--primary); }
+  .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .alert-text .alert-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .alert-text .alert-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* Trend line (SVG) */
+  .trend-chart { width: 100%; }
+
+  /* Toggle buttons */
+  .segmentation-toggle { display: flex; gap: 8px; margin-bottom: 20px; }
+  .seg-btn { padding: 7px 16px; border-radius: 8px; border: 1px solid var(--border); background: white; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .seg-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  /* EEI formula display */
+  .formula-box { background: #1a1d2e; color: #a5b4fc; border-radius: 12px; padding: 20px 24px; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.8; }
+  .formula-box .formula-comment { color: #4b5563; }
+  .formula-box .formula-val { color: #34d399; font-weight: 700; }
+
+  /* KRR */
+  .krr-bars { display: flex; flex-direction: column; gap: 10px; }
+  .krr-bar-row { display: flex; align-items: center; gap: 10px; }
+  .krr-month { width: 36px; font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .krr-track { flex: 1; height: 22px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
+  .krr-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 700; color: white; }
+  .krr-label { width: 36px; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; }
+  ::-webkit-scrollbar-thumb { background: #c4c4c4; border-radius: 3px; }
+
+  /* Tooltip */
+  .tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
+  .tooltip-icon { width: 16px; height: 16px; border-radius: 50%; background: #e5e7eb; color: var(--text-muted); font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: help; margin-left: 6px; flex-shrink: 0; }
+  .tooltip-box { position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%); background: #1a1d2e; color: white; font-size: 11px; padding: 8px 12px; border-radius: 8px; width: 200px; line-height: 1.5; pointer-events: none; opacity: 0; transition: opacity 0.2s; white-space: normal; z-index: 200; }
+  .tooltip-wrap:hover .tooltip-box { opacity: 1; }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .grid-2-1, .grid-1-2 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 700px) {
+    .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    .main-content { padding: 16px; }
+    .nav-tabs { overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">
+    <div class="logo-icon">📊</div>
+    <span>We Advocacy</span>
+    <span style="font-weight:300;opacity:0.5;margin:0 6px">|</span>
+    <span style="font-size:13px;font-weight:400;opacity:0.7">Engagement Dashboard</span>
+  </div>
+  <div class="header-controls">
+    <select class="month-selector" id="monthSelector" onchange="updateMonth(this.value)">
+      <option value="Jan">January 2025</option>
+      <option value="Feb">February 2025</option>
+      <option value="Mar">March 2025</option>
+      <option value="Apr">April 2025</option>
+      <option value="May" selected>May 2025</option>
+      <option value="Jun">June 2025</option>
+    </select>
+    <button class="btn-export" onclick="exportPDF()">⬇ Export PDF</button>
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('overview', this)">📈 Executive Overview</div>
+  <div class="nav-tab" onclick="switchTab('channels', this)">📡 Channel Performance</div>
+  <div class="nav-tab" onclick="switchTab('sentiment', this)">💬 Sentiment & eNPS</div>
+  <div class="nav-tab" onclick="switchTab('content', this)">🗂 Content Analysis</div>
+  <div class="nav-tab" onclick="switchTab('segmentation', this)">🏢 Segmentation</div>
+  <div class="nav-tab" onclick="switchTab('metrics', this)">🔢 Metric Engineering</div>
+</nav>
+
+<div class="main-content">
+
+  <!-- ======================== TAB: OVERVIEW ======================== -->
+  <div id="tab-overview" class="tab-panel active">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Monthly Executive Report — May 2025</div>
+        <div class="section-subtitle">Comprehensive employee engagement analysis across all communication channels</div>
+      </div>
+      <span class="section-badge">Monthly Synthesis</span>
+    </div>
+
+    <!-- North Star KPIs -->
+    <div class="grid-4">
+      <div class="card">
+        <div class="card-title" style="display:flex;align-items:center">
+          Global Engagement Index (EEI)
+          <div class="tooltip-wrap">
+            <div class="tooltip-icon">?</div>
+            <div class="tooltip-box">EEI = Σ(Actions × Weights) / (Total Headcount × Max Weight) × 100. Views=1, Clicks=3, Survey responses=5.</div>
+          </div>
+        </div>
+        <div class="card-value" id="eeiScore" style="color:var(--primary)">72.4</div>
+        <div class="delta up" id="eeiDelta">▲ +3.2 vs April</div>
+        <div class="card-sub">Target: 70 · Status: <strong style="color:var(--success)">Achieved ✓</strong></div>
+        <div style="margin-top:12px">
+          <div class="mini-bar"><div class="mini-bar-fill" id="eeiBar" style="width:72.4%;background:var(--primary)"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Employee Net Promoter Score</div>
+        <div class="card-value" id="enpsScore" style="color:var(--success)">+38</div>
+        <div class="delta up" id="enpsDelta">▲ +5 vs April</div>
+        <div class="card-sub">Excellent threshold: +30 · Status: <strong style="color:var(--success)">Excellent ✓</strong></div>
+        <div style="margin-top:12px;display:flex;gap:8px;font-size:11px">
+          <div style="flex:1;text-align:center;background:var(--success-light);border-radius:6px;padding:4px">
+            <div style="font-weight:700;color:var(--success)" id="promotersPct">62%</div>
+            <div style="color:var(--text-muted)">Promoters</div>
+          </div>
+          <div style="flex:1;text-align:center;background:#f3f4f6;border-radius:6px;padding:4px">
+            <div style="font-weight:700;color:var(--neutral)" id="passivesPct">14%</div>
+            <div style="color:var(--text-muted)">Passives</div>
+          </div>
+          <div style="flex:1;text-align:center;background:var(--danger-light);border-radius:6px;padding:4px">
+            <div style="font-weight:700;color:var(--danger)" id="detractorsPct">24%</div>
+            <div style="color:var(--text-muted)">Detractors</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Survey Participation Rate</div>
+        <div class="card-value" id="surveyRate" style="color:var(--warning)">67%</div>
+        <div class="delta down" id="surveyDelta">▼ -3% vs April</div>
+        <div class="card-sub">Excellence target: 70% · Status: <strong style="color:var(--warning)">Near target</strong></div>
+        <div style="margin-top:12px">
+          <div class="mini-bar"><div class="mini-bar-fill" id="surveyBar" style="width:67%;background:var(--warning)"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:4px"><span>0%</span><span style="color:var(--warning);font-weight:600">Target: 70%</span><span>100%</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Knowledge Retention Rate</div>
+        <div class="card-value" id="krrScore" style="color:#8b5cf6">81%</div>
+        <div class="delta up" id="krrDelta">▲ +2% vs April</div>
+        <div class="card-sub">Based on 847 quiz completions this month</div>
+        <div style="margin-top:12px">
+          <div class="mini-bar"><div class="mini-bar-fill" id="krrBar" style="width:81%;background:#8b5cf6"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trend + Signals -->
+    <div class="grid-2-1">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:16px">
+          <div class="card-title" style="margin-bottom:0">EEI Trend — 6 Months</div>
+          <span style="font-size:11px;color:var(--text-muted)">Jan–Jun 2025</span>
+        </div>
+        <svg class="trend-chart" viewBox="0 0 500 140" id="trendChart"></svg>
+        <div style="display:flex;justify-content:space-around;margin-top:8px">
+          <span style="font-size:11px;color:var(--text-muted)">Jan</span>
+          <span style="font-size:11px;color:var(--text-muted)">Feb</span>
+          <span style="font-size:11px;color:var(--text-muted)">Mar</span>
+          <span style="font-size:11px;color:var(--text-muted)">Apr</span>
+          <span style="font-size:11px;font-weight:700;color:var(--primary)">May ★</span>
+          <span style="font-size:11px;color:var(--text-muted)">Jun</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Weak Signals & Alerts</div>
+        <div class="alert-box warning">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-text">
+            <div class="alert-title">Operations dept. — Low engagement</div>
+            <div class="alert-desc">CTR dropped 18% in 4 weeks. Possible overload or management friction. Review recommended.</div>
+          </div>
+        </div>
+        <div class="alert-box success">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">
+            <div class="alert-title">SMS campaign outperformed Email</div>
+            <div class="alert-desc">Field workers reached at 97% read rate vs. 28% email open rate for the same message.</div>
+          </div>
+        </div>
+        <div class="alert-box danger">
+          <div class="alert-icon">🔴</div>
+          <div class="alert-text">
+            <div class="alert-title">Information overload risk</div>
+            <div class="alert-desc">Volume +22% but engagement down 4%. Consider consolidating communication frequency.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Channel overview quick -->
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-title" style="margin-bottom:18px">Channel Performance Summary — May 2025</div>
+      <div class="bar-chart" id="channelSummaryBars"></div>
+    </div>
+
+    <!-- Benchmarks -->
+    <div class="card">
+      <div class="section-header" style="margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0">Industry Benchmarks — Internal Email Open Rates 2024–2025</div>
+        <span style="font-size:11px;color:var(--text-muted)">Your performance vs. sector average</span>
+      </div>
+      <div id="benchmarkBars"></div>
+    </div>
+  </div>
+
+  <!-- ======================== TAB: CHANNELS ======================== -->
+  <div id="tab-channels" class="tab-panel">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Channel Performance Analysis</div>
+        <div class="section-subtitle">Detailed metrics for Email, SMS, Desktop Popup & Mobile Push</div>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:28px">
+      <div class="channel-card ch-email">
+        <div class="ch-bg">✉</div>
+        <div class="ch-icon">✉️</div>
+        <div class="ch-name">Email / Newsletter</div>
+        <div class="ch-metric">
+          <span class="ch-metric-label">Open Rate</span>
+          <span class="ch-metric-val" style="color:#2563eb">34.2%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-bar-fill" style="width:34.2%;background:#2563eb"></div></div>
+        <div class="ch-metric" style="margin-top:10px">
+          <span class="ch-metric-label">Click Rate (CTR)</span>
+          <span class="ch-metric-val" style="color:#2563eb">4.1%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-bar-fill" style="width:41%;background:#93c5fd"></div></div>
+        <div class="ch-metric" style="margin-top:10px">
+          <span class="ch-metric-label">CTOR</span>
+          <span class="ch-metric-val" style="color:#2563eb">11.9%</span>
+        </div>
+        <div style="margin-top:12px"><span class="badge badge-neutral">Structured content</span></div>
+      </div>
+
+      <div class="channel-card ch-sms">
+        <div class="ch-bg">💬</div>
+        <div class="ch-icon">💬</div>
+        <div class="ch-name">SMS</div>
+        <div class="ch-metric">
+          <span class="ch-metric-label">Open Rate</span>
+          <span class="ch-metric-val" style="color:#059669">97%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-bar-fill" style="width:97%;background:#059669"></div></div>
+        <div class="ch-metric" style="margin-top:10px">
+          <span class="ch-metric-label">Click Rate (CTR)</span>
+          <span class="ch-metric-val" style="color:#059669">22.3%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-bar-fill" style="width:62%;background:#6ee7b7"></div></div>
+        <div class="ch-metric" style="margin-top:10px">
+          <span class="ch-metric-label">Read within 3 min</span>
+          <span class="ch-metric-val" style="color:#059669">90%</span>
+        </div>
+        <div style="margin-top:12px"><span class="badge" style="background:#d1fae5;color:#065f46">Field workers ★</span></div>
+      </div>
+
+      <div class="channel-card ch-popup">
+        <div class="ch-bg">🖥</div>
+        <div class="ch-icon">🖥️</div>
+        <div class="ch-name">Desktop Popup Alert</div>
+        <div class="ch-metric">
+          <span class="ch-metric-label">Acknowledgement Rate</span>
+          <span class="ch-metric-val" style="color:#7c3aed">96.8%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-bar-fill" style="width:96.8%;background:#7c3aed"></div></div>
+        <div class="ch-metric" style="margin-top:10px">
+          <span class="ch-metric-label">CTA Click Rate</span>
+          <span class="ch-metric-val" style="color:#7c3aed">38.5%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-bar-fill" style="width:38.5%;background:#c4b5fd"></div></div>
+        <div class="ch-metric" style="margin-top:10px">
+          <span class="ch-metric-label">Avg. time to acknowledge</span>
+          <span class="ch-metric-val" style="color:#7c3aed">4.2 min</span>
+        </div>
+        <div style="margin-top:12px"><span class="badge" style="background:#ede9fe;color:#5b21b6">Critical alerts</span></div>
+      </div>
+
+      <div class="channel-card ch-push">
+        <div class="ch-bg">📱</div>
+        <div class="ch-icon">📱</div>
+        <div class="ch-name">Mobile Push</div>
+        <div class="ch-metric">
+          <span class="ch-metric-label">Open Rate</span>
+          <span class="ch-metric-val" style="color:#d97706">71.4%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-bar-fill" style="width:71.4%;background:#d97706"></div></div>
+        <div class="ch-metric" style="margin-top:10px">
+          <span class="ch-metric-label">Click Rate (CTR)</span>
+          <span class="ch-metric-val" style="color:#d97706">7.8%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-bar-fill" style="width:78%;background:#fcd34d"></div></div>
+        <div class="ch-metric" style="margin-top:10px">
+          <span class="ch-metric-label">App Adoption</span>
+          <span class="ch-metric-val" style="color:#d97706">84%</span>
+        </div>
+        <div style="margin-top:12px"><span class="badge" style="background:#fff7ed;color:#92400e">Daily news</span></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:18px">Open Rate Comparison vs. Industry Benchmark</div>
+        <div id="channelCompareBars"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Recommended Channel by Use Case</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Use Case</th>
+              <th>Best Channel</th>
+              <th>Expected Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>🚨 Emergency / Safety</td><td><span class="badge" style="background:#ede9fe;color:#5b21b6">Popup PC</span></td><td><strong>96–100%</strong></td></tr>
+            <tr><td>📋 Compliance / IT</td><td><span class="badge" style="background:#ede9fe;color:#5b21b6">Popup PC</span></td><td><strong>96–100%</strong></td></tr>
+            <tr><td>👷 Field workers</td><td><span class="badge" style="background:#d1fae5;color:#065f46">SMS</span></td><td><strong>97–98%</strong></td></tr>
+            <tr><td>📰 Leadership news</td><td><span class="badge" style="background:#dbeafe;color:#1e40af">Email</span></td><td><strong>30–40%</strong></td></tr>
+            <tr><td>📣 Daily updates</td><td><span class="badge" style="background:#fff7ed;color:#92400e">Mobile Push</span></td><td><strong>60–80%</strong></td></tr>
+            <tr><td>📝 Surveys / Polls</td><td><span class="badge" style="background:#d1fae5;color:#065f46">SMS + Email</span></td><td><strong>65–75%</strong></td></tr>
+            <tr><td>🎓 Training reminders</td><td><span class="badge" style="background:#d1fae5;color:#065f46">SMS</span></td><td><strong>90–97%</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">Monthly Volume vs. Engagement Rate (Infobésité Monitor)</div>
+      <div id="infobesityAlert" class="alert-box warning" style="margin-bottom:16px">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-text">
+          <div class="alert-title">Information overload risk detected</div>
+          <div class="alert-desc">Message volume increased by 22% this month while overall engagement declined by 4%. Consider reducing frequency or consolidating content to prevent total disengagement.</div>
+        </div>
+      </div>
+      <svg id="volumeEngagementChart" viewBox="0 0 600 160" style="width:100%"></svg>
+      <div style="display:flex;justify-content:space-around;margin-top:4px">
+        <span style="font-size:11px;color:var(--text-muted)">Jan</span>
+        <span style="font-size:11px;color:var(--text-muted)">Feb</span>
+        <span style="font-size:11px;color:var(--text-muted)">Mar</span>
+        <span style="font-size:11px;color:var(--text-muted)">Apr</span>
+        <span style="font-size:11px;font-weight:700;color:var(--primary)">May</span>
+        <span style="font-size:11px;color:var(--text-muted)">Jun</span>
+      </div>
+      <div style="display:flex;gap:20px;margin-top:12px;justify-content:center;font-size:12px">
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;background:#4f46e5;display:inline-block;border-radius:2px"></span>EEI Score</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;background:#f59e0b;display:inline-block;border-radius:2px;border-top:2px dashed #f59e0b"></span>Message Volume Index</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== TAB: SENTIMENT ======================== -->
+  <div id="tab-sentiment" class="tab-panel">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Sentiment Analysis & eNPS</div>
+        <div class="section-subtitle">Employee feedback from smiley reactions, star ratings, and pulse surveys</div>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:24px">
+      <div class="card" style="grid-column:span 1">
+        <div class="card-title" style="margin-bottom:12px">eNPS Score</div>
+        <div class="enps-display">
+          <div class="enps-score" id="enpsDisplay" style="color:var(--success)">+38</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:6px">Employee Net Promoter Score</div>
+          <div class="enps-track" style="margin:16px 0 6px">
+            <div class="enps-needle" id="enpsNeedle" style="left:69%"></div>
+          </div>
+          <div class="enps-labels"><span>-100</span><span>0</span><span style="color:var(--success);font-weight:600">+30★</span><span>+100</span></div>
+          <div style="margin-top:16px;display:flex;gap:8px">
+            <div style="flex:1;background:var(--success-light);border-radius:8px;padding:10px;text-align:center">
+              <div style="font-size:20px;font-weight:800;color:var(--success)" id="promotersCount">62%</div>
+              <div style="font-size:11px;color:var(--text-muted)">😊 Promoters</div>
+            </div>
+            <div style="flex:1;background:#f3f4f6;border-radius:8px;padding:10px;text-align:center">
+              <div style="font-size:20px;font-weight:800;color:var(--neutral)" id="passivesCount">14%</div>
+              <div style="font-size:11px;color:var(--text-muted)">😐 Passives</div>
+            </div>
+            <div style="flex:1;background:var(--danger-light);border-radius:8px;padding:10px;text-align:center">
+              <div style="font-size:20px;font-weight:800;color:var(--danger)" id="detractorsCount">24%</div>
+              <div style="font-size:11px;color:var(--text-muted)">😞 Detractors</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;background:var(--primary-light);border-radius:8px;padding:10px;font-size:12px;text-align:center">
+            <strong style="color:var(--primary)">Formula:</strong> <span style="color:var(--text-secondary)">eNPS = %Promoters − %Detractors = 62% − 24% = <strong style="color:var(--success)">+38</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Smiley Distribution (3-Level Scale)</div>
+        <div class="sentiment-wrap">
+          <svg class="donut-svg" viewBox="0 0 160 160" id="smileDonut"></svg>
+          <div class="sentiment-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--success)"></div>
+              <span class="legend-label">😊 Promoters</span>
+              <span class="legend-val" style="color:var(--success)">62%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--warning)"></div>
+              <span class="legend-label">😐 Passives</span>
+              <span class="legend-val" style="color:var(--warning)">14%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--danger)"></div>
+              <span class="legend-label">😞 Detractors</span>
+              <span class="legend-val" style="color:var(--danger)">24%</span>
+            </div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+              <div style="font-size:11px;color:var(--text-muted)">Total responses</div>
+              <div style="font-size:20px;font-weight:700">1,284</div>
+              <div style="font-size:11px;color:var(--success)">↑ +127 vs April</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:8px">VIGILANCE THRESHOLDS</div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;text-align:center;background:#fee2e2;border-radius:6px;padding:6px">
+              <div style="font-size:11px;color:var(--danger);font-weight:600">⚠ Alert</div>
+              <div style="font-size:12px;font-weight:700">eNPS &lt; 0</div>
+            </div>
+            <div style="flex:1;text-align:center;background:var(--success-light);border-radius:6px;padding:6px">
+              <div style="font-size:11px;color:var(--success);font-weight:600">★ Excellence</div>
+              <div style="font-size:12px;font-weight:700">eNPS &gt; 30</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">ESI — Employee Satisfaction Index</div>
+        <div style="text-align:center;padding:16px 0">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Content Satisfaction Score</div>
+          <div style="font-size:56px;font-weight:800;color:#8b5cf6">78<span style="font-size:24px;color:var(--text-muted)">%</span></div>
+          <div style="font-size:12px;color:var(--text-muted)">Target: 75% · Status: ✅ Achieved</div>
+        </div>
+        <div style="background:#f9fafb;border-radius:10px;padding:14px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px">ESI BY CONTENT TYPE</div>
+          <div class="bar-chart" id="esiBars"></div>
+        </div>
+        <div style="background:var(--primary-light);border-radius:8px;padding:10px;font-size:11px;text-align:center;color:var(--primary)">
+          ESI = Σ(Rating × Votes) / (Total Votes × Max Rating) × 100
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">eNPS Trend — 6 Months</div>
+        <svg id="enpsChart" viewBox="0 0 480 130" style="width:100%"></svg>
+        <div style="display:flex;justify-content:space-around;margin-top:4px">
+          <span style="font-size:11px;color:var(--text-muted)">Jan</span>
+          <span style="font-size:11px;color:var(--text-muted)">Feb</span>
+          <span style="font-size:11px;color:var(--text-muted)">Mar</span>
+          <span style="font-size:11px;color:var(--text-muted)">Apr</span>
+          <span style="font-size:11px;font-weight:700;color:var(--success)">May ★</span>
+          <span style="font-size:11px;color:var(--text-muted)">Jun</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">5-Star Rating Distribution</div>
+        <div id="starDistribution"></div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+          <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px">5-STAR → eNPS CONVERSION</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#d1fae5;border-radius:6px">
+              <span>⭐⭐⭐⭐⭐ (5 stars)</span>
+              <span style="font-weight:700;color:var(--success)">Promoters → eNPS+</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f3f4f6;border-radius:6px">
+              <span>⭐⭐⭐⭐ (4 stars)</span>
+              <span style="font-weight:700;color:var(--neutral)">Passives → Neutral</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#fee2e2;border-radius:6px">
+              <span>⭐⭐⭐ or less (1–3)</span>
+              <span style="font-weight:700;color:var(--danger)">Detractors → eNPS−</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== TAB: CONTENT ======================== -->
+  <div id="tab-content" class="tab-panel">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Content Performance Analysis</div>
+        <div class="section-subtitle">Top and bottom performing content by CTR, engagement, and sentiment</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">🏆 Top 5 Content — Best CTR</div>
+        <table class="data-table" id="topContentTable"></table>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">📉 Flop 3 Content — Lowest Engagement</div>
+        <table class="data-table" id="flopContentTable"></table>
+        <div class="alert-box danger" style="margin-top:16px">
+          <div class="alert-icon">💡</div>
+          <div class="alert-text">
+            <div class="alert-title">Recommendation</div>
+            <div class="alert-desc">Process change announcements show low engagement. Consider switching from email to desktop popup for mandatory reads, or adding interactive quiz to verify comprehension.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-title" style="margin-bottom:18px">Engagement by Content Category</div>
+      <div id="categoryBars"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Content Volume by Category</div>
+        <svg id="contentDonut" viewBox="0 0 320 180" style="width:100%"></svg>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">📅 Best Send Times for Maximum Engagement</div>
+        <div style="display:flex;flex-direction:column;gap:10px" id="sendTimes"></div>
+        <div class="alert-box info" style="margin-top:16px">
+          <div class="alert-icon">💡</div>
+          <div class="alert-text">
+            <div class="alert-title">Timing optimization opportunity</div>
+            <div class="alert-desc">Tuesday 9–11am consistently delivers highest open rates. Avoid Friday afternoons (−38% vs. peak).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== TAB: SEGMENTATION ======================== -->
+  <div id="tab-segmentation" class="tab-panel">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Segmented Engagement Analysis</div>
+        <div class="section-subtitle">Identify disengagement zones by department and geography</div>
+      </div>
+    </div>
+
+    <div class="segmentation-toggle">
+      <button class="seg-btn active" onclick="switchSeg('dept', this)">By Department</button>
+      <button class="seg-btn" onclick="switchSeg('geo', this)">By Location</button>
+      <button class="seg-btn" onclick="switchSeg('profile', this)">By Worker Profile</button>
+    </div>
+
+    <div id="seg-dept" class="seg-panel">
+      <div class="grid-1-2" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Department Engagement Heatmap</div>
+          <div id="deptHeatmap"></div>
+          <div style="display:flex;gap:8px;margin-top:16px;align-items:center;font-size:11px;color:var(--text-muted)">
+            <span>Low</span>
+            <div style="flex:1;height:8px;background:linear-gradient(to right,#fee2e2,#fef3c7,#d1fae5);border-radius:4px"></div>
+            <span>High</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:18px">Engagement by Department — EEI Score</div>
+          <div id="deptBars"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Department Turnover Risk Correlation</div>
+        <div class="alert-box warning" style="margin-bottom:16px">
+          <div class="alert-icon">📉</div>
+          <div class="alert-text">
+            <div class="alert-title">Leading indicator alert — Operations Department</div>
+            <div class="alert-desc">A sudden CTR drop in a department's internal newsletters is correlated with voluntary turnover increase within 3–6 months. Operations dept. shows -18% CTR decline. Recommend immediate manager check-in.</div>
+          </div>
+        </div>
+        <table class="data-table" id="turnoverTable"></table>
+      </div>
+    </div>
+
+    <div id="seg-geo" class="seg-panel" style="display:none">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Engagement by Geographic Site</div>
+        <div id="geoBars"></div>
+        <div class="alert-box info" style="margin-top:16px">
+          <div class="alert-icon">📍</div>
+          <div class="alert-text">
+            <div class="alert-title">Lyon & Marseille sites underperforming</div>
+            <div class="alert-desc">Both southern sites show EEI below 55. Possible language/communication frequency mismatch. Consider local content adaptation strategy.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="seg-profile" class="seg-panel" style="display:none">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Engagement by Worker Profile</div>
+        <div id="profileBars"></div>
+        <div class="alert-box success" style="margin-top:16px">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">
+            <div class="alert-title">Field workers newly connected via SMS</div>
+            <div class="alert-desc">Since implementing SMS as primary channel for field workers, their engagement rate improved from 31% to 79% — SMS is often the only direct company link for non-desk employees.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== TAB: METRICS ======================== -->
+  <div id="tab-metrics" class="tab-panel">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Metric Engineering & Formulas</div>
+        <div class="section-subtitle">Calculation methodologies and interactive metric simulator</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">EEI — Global Engagement Index Calculator</div>
+        <div class="formula-box" style="margin-bottom:16px">
+          <div><span class="formula-comment">// Employee Engagement Index</span></div>
+          <div>EEI = ( Σ(Actions × Weights) / (Headcount × MaxWeight) ) × 100</div>
+          <div style="margin-top:8px"><span class="formula-comment">// Weights:</span></div>
+          <div>View = <span class="formula-val">1</span> · Click = <span class="formula-val">3</span> · Survey = <span class="formula-val">5</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:12px">
+            <label style="width:120px;font-size:12px;font-weight:500">👁 Views</label>
+            <input type="range" id="simViews" min="0" max="1000" value="650" oninput="calcEEI()" style="flex:1">
+            <span id="simViewsVal" style="width:40px;text-align:right;font-weight:700">650</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:12px">
+            <label style="width:120px;font-size:12px;font-weight:500">🖱 Clicks</label>
+            <input type="range" id="simClicks" min="0" max="500" value="180" oninput="calcEEI()" style="flex:1">
+            <span id="simClicksVal" style="width:40px;text-align:right;font-weight:700">180</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:12px">
+            <label style="width:120px;font-size:12px;font-weight:500">📝 Surveys</label>
+            <input type="range" id="simSurveys" min="0" max="300" value="95" oninput="calcEEI()" style="flex:1">
+            <span id="simSurveysVal" style="width:40px;text-align:right;font-weight:700">95</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:12px">
+            <label style="width:120px;font-size:12px;font-weight:500">👥 Headcount</label>
+            <input type="range" id="simHeadcount" min="100" max="2000" value="1000" oninput="calcEEI()" style="flex:1">
+            <span id="simHeadcountVal" style="width:40px;text-align:right;font-weight:700">1000</span>
+          </div>
+        </div>
+        <div id="eeiResult" style="background:var(--primary-light);border-radius:12px;padding:20px;text-align:center">
+          <div style="font-size:13px;color:var(--primary);font-weight:600;margin-bottom:4px">Computed EEI</div>
+          <div id="eeiResultVal" style="font-size:48px;font-weight:800;color:var(--primary)">—</div>
+          <div id="eeiResultStatus" style="font-size:12px;margin-top:4px"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">eNPS Calculator</div>
+        <div class="formula-box" style="margin-bottom:16px">
+          <div><span class="formula-comment">// Employee Net Promoter Score</span></div>
+          <div>eNPS = <span class="formula-val">%Promoters</span> − <span class="formula-val">%Detractors</span></div>
+          <div style="margin-top:8px"><span class="formula-comment">// Range: -100 to +100</span></div>
+          <div><span class="formula-comment">// Excellent: &gt; +30 | Good: 0 to +30 | Alert: &lt; 0</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:12px">
+            <label style="width:130px;font-size:12px;font-weight:500">😊 Promoters %</label>
+            <input type="range" id="npsPromoters" min="0" max="100" value="62" oninput="calcNPS()" style="flex:1">
+            <span id="npsPromotersVal" style="width:40px;text-align:right;font-weight:700;color:var(--success)">62%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:12px">
+            <label style="width:130px;font-size:12px;font-weight:500">😐 Passives %</label>
+            <input type="range" id="npsPassives" min="0" max="100" value="14" oninput="calcNPS()" style="flex:1">
+            <span id="npsPassivesVal" style="width:40px;text-align:right;font-weight:700;color:var(--neutral)">14%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:12px">
+            <label style="width:130px;font-size:12px;font-weight:500">😞 Detractors %</label>
+            <input type="range" id="npsDetractors" min="0" max="100" value="24" oninput="calcNPS()" style="flex:1">
+            <span id="npsDetractorsVal" style="width:40px;text-align:right;font-weight:700;color:var(--danger)">24%</span>
+          </div>
+        </div>
+        <div id="npsResult" style="background:var(--success-light);border-radius:12px;padding:20px;text-align:center">
+          <div style="font-size:13px;color:var(--success);font-weight:600;margin-bottom:4px">Computed eNPS</div>
+          <div id="npsResultVal" style="font-size:48px;font-weight:800;color:var(--success)">+38</div>
+          <div id="npsResultStatus" style="font-size:12px;margin-top:4px;color:var(--success)">🌟 Excellent — Above +30 threshold</div>
+        </div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);text-align:center">
+          Note: Passives do not affect eNPS score calculation
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Knowledge Retention Rate (KRR) — 6-Month Trend</div>
+        <div class="formula-box" style="margin-bottom:16px">
+          <div>KRR = ( Avg Score / Max Score ) × 100</div>
+        </div>
+        <div class="krr-bars" id="krrBars"></div>
+        <div class="alert-box warning" style="margin-top:16px">
+          <div class="alert-icon">📚</div>
+          <div class="alert-text">
+            <div class="alert-title">Knowledge refresh recommended</div>
+            <div class="alert-desc">KRR drop in February (after restructuring announcement) suggests employees need additional reinforcement. Schedule a refresher quiz series for Q3.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Survey Participation Rate Calculator</div>
+        <div class="formula-box" style="margin-bottom:16px">
+          <div>Participation = ( Respondents / Recipients ) × 100</div>
+          <div style="margin-top:8px"><span class="formula-comment">// Excellence target: ≥ 70%</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:12px">
+            <label style="width:130px;font-size:12px;font-weight:500">📨 Recipients</label>
+            <input type="range" id="survRecipients" min="100" max="2000" value="1000" oninput="calcSurvey()" style="flex:1">
+            <span id="survRecipientsVal" style="width:50px;text-align:right;font-weight:700">1000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:12px">
+            <label style="width:130px;font-size:12px;font-weight:500">✅ Respondents</label>
+            <input type="range" id="survRespondents" min="0" max="2000" value="670" oninput="calcSurvey()" style="flex:1">
+            <span id="survRespondentsVal" style="width:50px;text-align:right;font-weight:700">670</span>
+          </div>
+        </div>
+        <div id="surveyResult" style="background:#fef3c7;border-radius:12px;padding:20px;text-align:center">
+          <div style="font-size:13px;color:#92400e;font-weight:600;margin-bottom:4px">Participation Rate</div>
+          <div id="surveyResultVal" style="font-size:48px;font-weight:800;color:var(--warning)">67%</div>
+          <div id="surveyResultStatus" style="font-size:12px;margin-top:4px;color:#92400e">⚠ Near target — 3 points below the 70% excellence standard</div>
+        </div>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:11px;font-weight:600;color:var(--text-muted)">REFERENCE THRESHOLDS</div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;background:#fee2e2;border-radius:6px;padding:8px;text-align:center;font-size:12px">
+              <div style="font-weight:700;color:var(--danger)">&lt; 40%</div>
+              <div style="color:var(--text-muted)">Alert</div>
+            </div>
+            <div style="flex:1;background:#fef3c7;border-radius:6px;padding:8px;text-align:center;font-size:12px">
+              <div style="font-weight:700;color:var(--warning)">40–70%</div>
+              <div style="color:var(--text-muted)">Acceptable</div>
+            </div>
+            <div style="flex:1;background:#d1fae5;border-radius:6px;padding:8px;text-align:center;font-size:12px">
+              <div style="font-weight:700;color:var(--success)">&ge; 70%</div>
+              <div style="color:var(--text-muted)">Excellence</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ==========================================
+// DATA
+// ==========================================
+const monthData = {
+  Jan: { eei: 61.2, enps: 22, survey: 58, krr: 74, promoters: 51, passives: 20, detractors: 29 },
+  Feb: { eei: 59.8, enps: 18, survey: 55, krr: 68, promoters: 49, passives: 19, detractors: 31 },
+  Mar: { eei: 64.5, enps: 25, survey: 61, krr: 76, promoters: 54, passives: 17, detractors: 29 },
+  Apr: { eei: 69.2, enps: 33, survey: 70, krr: 79, promoters: 58, passives: 15, detractors: 25 },
+  May: { eei: 72.4, enps: 38, survey: 67, krr: 81, promoters: 62, passives: 14, detractors: 24 },
+  Jun: { eei: 74.1, enps: 41, survey: 72, krr: 83, promoters: 64, passives: 13, detractors: 23 }
+};
+let currentMonth = 'May';
+
+function updateMonth(month) {
+  currentMonth = month;
+  const d = monthData[month];
+  if (!d) return;
+  document.getElementById('eeiScore').textContent = d.eei;
+  document.getElementById('enpsScore').textContent = (d.enps > 0 ? '+' : '') + d.enps;
+  document.getElementById('surveyRate').textContent = d.survey + '%';
+  document.getElementById('krrScore').textContent = d.krr + '%';
+  document.getElementById('eeiBar').style.width = d.eei + '%';
+  document.getElementById('surveyBar').style.width = d.survey + '%';
+  document.getElementById('krrBar').style.width = d.krr + '%';
+  document.getElementById('promotersPct').textContent = d.promoters + '%';
+  document.getElementById('passivesPct').textContent = d.passives + '%';
+  document.getElementById('detractorsPct').textContent = d.detractors + '%';
+  document.getElementById('enpsDisplay').textContent = (d.enps > 0 ? '+' : '') + d.enps;
+  document.getElementById('enpsDisplay').style.color = d.enps >= 30 ? 'var(--success)' : d.enps >= 0 ? 'var(--warning)' : 'var(--danger)';
+  document.getElementById('promotersCount').textContent = d.promoters + '%';
+  document.getElementById('passivesCount').textContent = d.passives + '%';
+  document.getElementById('detractorsCount').textContent = d.detractors + '%';
+  const needlePos = ((d.enps + 100) / 200) * 100;
+  document.getElementById('enpsNeedle').style.left = needlePos + '%';
+  drawSmileDonut(d.promoters, d.passives, d.detractors);
+}
+
+// ==========================================
+// TABS
+// ==========================================
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  el.classList.add('active');
+}
+
+function switchSeg(seg, el) {
+  document.querySelectorAll('.seg-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('seg-' + seg).style.display = 'block';
+  el.classList.add('active');
+}
+
+// ==========================================
+// TREND CHART (SVG)
+// ==========================================
+function drawTrendChart() {
+  const data = [61.2, 59.8, 64.5, 69.2, 72.4, 74.1];
+  const svg = document.getElementById('trendChart');
+  const W = 500, H = 140, pad = 30;
+  const maxV = 80, minV = 50;
+  const pts = data.map((v, i) => {
+    const x = pad + (i / (data.length - 1)) * (W - pad * 2);
+    const y = H - pad - ((v - minV) / (maxV - minV)) * (H - pad * 2);
+    return [x, y];
+  });
+  const pathD = pts.map((p, i) => (i === 0 ? `M ${p[0]} ${p[1]}` : `L ${p[0]} ${p[1]}`)).join(' ');
+  const areaD = pathD + ` L ${pts[pts.length-1][0]} ${H-pad} L ${pts[0][0]} ${H-pad} Z`;
+
+  // Grid lines
+  let gridLines = '';
+  [55, 60, 65, 70, 75].forEach(v => {
+    const y = H - pad - ((v - minV) / (maxV - minV)) * (H - pad * 2);
+    gridLines += `<line x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}" stroke="#f0f0f0" stroke-width="1"/>`;
+    gridLines += `<text x="${pad-4}" y="${y+4}" font-size="10" fill="#9ca3af" text-anchor="end">${v}</text>`;
+  });
+
+  // Target line
+  const targetY = H - pad - ((70 - minV) / (maxV - minV)) * (H - pad * 2);
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#4f46e5" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    ${gridLines}
+    <line x1="${pad}" y1="${targetY}" x2="${W-pad}" y2="${targetY}" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <text x="${W-pad+4}" y="${targetY+4}" font-size="10" fill="#f59e0b" font-weight="600">Target</text>
+    <path d="${areaD}" fill="url(#trendGrad)"/>
+    <path d="${pathD}" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map((p, i) => `
+      <circle cx="${p[0]}" cy="${p[1]}" r="${i === 4 ? 7 : 4}" fill="${i === 4 ? '#4f46e5' : 'white'}" stroke="#4f46e5" stroke-width="2"/>
+      <text x="${p[0]}" y="${p[1]-10}" font-size="10" fill="${i === 4 ? '#4f46e5' : '#6b7280'}" text-anchor="middle" font-weight="${i === 4 ? 700 : 400}">${data[i]}</text>
+    `).join('')}
+  `;
+}
+
+// ==========================================
+// CHANNEL SUMMARY BARS
+// ==========================================
+function drawChannelSummaryBars() {
+  const channels = [
+    { label: 'SMS', value: 97, color: '#059669', secondary: '22% CTR' },
+    { label: 'Popup PC', value: 96.8, color: '#7c3aed', secondary: '38.5% CTA' },
+    { label: 'Mobile Push', value: 71.4, color: '#d97706', secondary: '7.8% CTR' },
+    { label: 'Email', value: 34.2, color: '#2563eb', secondary: '4.1% CTR' },
+  ];
+  const container = document.getElementById('channelSummaryBars');
+  container.innerHTML = channels.map(c => `
+    <div class="bar-row">
+      <div class="bar-label">${c.label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${c.value}%;background:${c.color};min-width:80px">${c.secondary}</div>
+      </div>
+      <div class="bar-pct">${c.value}%</div>
+    </div>
+  `).join('');
+}
+
+// ==========================================
+// BENCHMARK BARS
+// ==========================================
+function drawBenchmarkBars() {
+  const sectors = [
+    { label: 'Industry/Manufacturing', value: 44.8, ctR: 4.22 },
+    { label: 'Education', value: 40.2, ctR: 1.93 },
+    { label: 'Software & SaaS', value: 39.3, ctR: 1.15 },
+    { label: 'Health & Medical', value: 37.0, ctR: 1.0 },
+    { label: 'Finance / Insurance', value: 30.4, ctR: 1.36 },
+  ];
+  const yours = 34.2;
+  const container = document.getElementById('benchmarkBars');
+  let html = '<div class="bar-chart">';
+  html += `<div class="bar-row">
+    <div class="bar-label" style="color:var(--primary);font-weight:700">★ Your Org.</div>
+    <div class="bar-track">
+      <div class="bar-fill" style="width:${yours}%;background:var(--primary)">34.2% open rate</div>
+    </div>
+    <div class="bar-pct" style="color:var(--primary)">${yours}%</div>
+  </div>`;
+  sectors.forEach(s => {
+    const isBelow = yours < s.value;
+    html += `<div class="bar-row">
+      <div class="bar-label">${s.label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${s.value}%;background:#d1d5db;color:#374151">${s.value}% avg.</div>
+      </div>
+      <div class="bar-pct" style="color:${isBelow ? 'var(--danger)' : 'var(--success)'}">${s.value}%</div>
+    </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ==========================================
+// CHANNEL COMPARE BARS
+// ==========================================
+function drawChannelCompareBars() {
+  const container = document.getElementById('channelCompareBars');
+  const data = [
+    { ch: 'SMS', yours: 97, bench: 98, color: '#059669' },
+    { ch: 'Popup PC', yours: 96.8, bench: 95, color: '#7c3aed' },
+    { ch: 'Mobile Push', yours: 71.4, bench: 70, color: '#d97706' },
+    { ch: 'Email', yours: 34.2, bench: 33, color: '#2563eb' },
+  ];
+  let html = '<div style="display:flex;flex-direction:column;gap:16px">';
+  data.forEach(d => {
+    html += `<div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="font-weight:600">${d.ch}</span>
+        <span style="color:var(--text-muted)">Yours: <strong style="color:${d.color}">${d.yours}%</strong> · Benchmark: ${d.bench}%</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div class="bar-track" style="height:18px">
+          <div class="bar-fill" style="width:${d.yours}%;background:${d.color};font-size:11px">${d.yours}%</div>
+        </div>
+        <div class="bar-track" style="height:10px">
+          <div class="bar-fill" style="width:${d.bench}%;background:#d1d5db;color:#374151;font-size:10px">${d.bench}%</div>
+        </div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ==========================================
+// SMILE DONUT
+// ==========================================
+function drawSmileDonut(p, pa, d) {
+  const svg = document.getElementById('smileDonut');
+  if (!svg) return;
+  const data = [
+    { val: p, color: '#10b981' },
+    { val: pa, color: '#f59e0b' },
+    { val: d, color: '#ef4444' },
+  ];
+  const total = data.reduce((a, b) => a + b.val, 0);
+  let startAngle = -Math.PI / 2;
+  const cx = 80, cy = 80, r = 60, ir = 35;
+  let paths = '';
+  data.forEach(seg => {
+    const angle = (seg.val / total) * 2 * Math.PI;
+    const endAngle = startAngle + angle;
+    const x1 = cx + r * Math.cos(startAngle), y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle), y2 = cy + r * Math.sin(endAngle);
+    const ix1 = cx + ir * Math.cos(startAngle), iy1 = cy + ir * Math.sin(startAngle);
+    const ix2 = cx + ir * Math.cos(endAngle), iy2 = cy + ir * Math.sin(endAngle);
+    const large = angle > Math.PI ? 1 : 0;
+    paths += `<path d="M ${ix1} ${iy1} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${large} 0 ${ix1} ${iy1}" fill="${seg.color}" opacity="0.9"/>`;
+    startAngle = endAngle;
+  });
+  svg.innerHTML = `${paths}<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="20" font-weight="800" fill="#1a1d2e">+${p - d}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="11" fill="#6b7280">eNPS</text>`;
+}
+
+// ==========================================
+// eNPS TREND
+// ==========================================
+function drawEnpsChart() {
+  const data = [22, 18, 25, 33, 38, 41];
+  const svg = document.getElementById('enpsChart');
+  const W = 480, H = 130, pad = 30;
+  const maxV = 50, minV = 0;
+  const pts = data.map((v, i) => {
+    const x = pad + (i / (data.length - 1)) * (W - pad * 2);
+    const y = H - pad - ((v - minV) / (maxV - minV)) * (H - pad * 2);
+    return [x, y];
+  });
+  const pathD = pts.map((p, i) => (i === 0 ? `M ${p[0]} ${p[1]}` : `L ${p[0]} ${p[1]}`)).join(' ');
+  const areaD = pathD + ` L ${pts[pts.length-1][0]} ${H-pad} L ${pts[0][0]} ${H-pad} Z`;
+  const ex30Y = H - pad - ((30 - minV) / (maxV - minV)) * (H - pad * 2);
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="enpsGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#10b981" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <line x1="${pad}" y1="${ex30Y}" x2="${W-pad}" y2="${ex30Y}" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <text x="${W-pad+4}" y="${ex30Y+4}" font-size="10" fill="#10b981" font-weight="600">+30</text>
+    <path d="${areaD}" fill="url(#enpsGrad)"/>
+    <path d="${pathD}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map((p, i) => `
+      <circle cx="${p[0]}" cy="${p[1]}" r="${i === 4 ? 7 : 4}" fill="${i === 4 ? '#10b981' : 'white'}" stroke="#10b981" stroke-width="2"/>
+      <text x="${p[0]}" y="${p[1]-10}" font-size="10" fill="${i === 4 ? '#10b981' : '#6b7280'}" text-anchor="middle" font-weight="${i === 4 ? 700 : 400}">${data[i] > 0 ? '+' : ''}${data[i]}</text>
+    `).join('')}
+  `;
+}
+
+// ==========================================
+// ESI BARS
+// ==========================================
+function drawESIBars() {
+  const container = document.getElementById('esiBars');
+  const items = [
+    { label: 'CEO Messages', val: 88, color: '#4f46e5' },
+    { label: 'HR News', val: 81, color: '#10b981' },
+    { label: 'IT Updates', val: 72, color: '#f59e0b' },
+    { label: 'CSR / Culture', val: 78, color: '#8b5cf6' },
+  ];
+  container.innerHTML = items.map(it => `
+    <div class="bar-row" style="margin-bottom:6px">
+      <div class="bar-label" style="font-size:11px">${it.label}</div>
+      <div class="bar-track" style="height:20px">
+        <div class="bar-fill" style="width:${it.val}%;background:${it.color};font-size:11px">${it.val}%</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==========================================
+// STAR DISTRIBUTION
+// ==========================================
+function drawStarDistribution() {
+  const container = document.getElementById('starDistribution');
+  const stars = [
+    { stars: 5, pct: 46, count: 591 },
+    { stars: 4, pct: 19, count: 244 },
+    { stars: 3, pct: 14, count: 180 },
+    { stars: 2, pct: 12, count: 154 },
+    { stars: 1, pct: 9, count: 115 },
+  ];
+  container.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">` + stars.map(s => `
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:60px;font-size:12px;font-weight:600;color:#f59e0b;text-align:right">${'⭐'.repeat(s.stars)}</div>
+      <div class="bar-track" style="flex:1;height:20px">
+        <div class="bar-fill" style="width:${s.pct}%;background:${s.stars >= 5 ? '#10b981' : s.stars === 4 ? '#6b7280' : '#ef4444'};font-size:11px">${s.count}</div>
+      </div>
+      <div style="width:36px;font-size:12px;font-weight:700;color:var(--text-secondary)">${s.pct}%</div>
+    </div>
+  `).join('') + `</div>`;
+}
+
+// ==========================================
+// VOLUME/ENGAGEMENT CHART
+// ==========================================
+function drawVolumeEngagementChart() {
+  const eeiData = [61.2, 59.8, 64.5, 69.2, 72.4, 74.1];
+  const volData = [55, 60, 63, 67, 82, 78]; // message volume index
+  const svg = document.getElementById('volumeEngagementChart');
+  const W = 600, H = 160, pad = 36;
+  const maxV = 90, minV = 40;
+
+  const eeips = eeiData.map((v, i) => [pad + (i / (eeiData.length - 1)) * (W - pad * 2), H - pad - ((v - minV) / (maxV - minV)) * (H - pad * 2)]);
+  const volps = volData.map((v, i) => [pad + (i / (volData.length - 1)) * (W - pad * 2), H - pad - ((v - minV) / (maxV - minV)) * (H - pad * 2)]);
+
+  const eeiPath = eeips.map((p, i) => (i === 0 ? `M ${p[0]} ${p[1]}` : `L ${p[0]} ${p[1]}`)).join(' ');
+  const volPath = volps.map((p, i) => (i === 0 ? `M ${p[0]} ${p[1]}` : `L ${p[0]} ${p[1]}`)).join(' ');
+
+  let gridLines = '';
+  [50, 60, 70, 80].forEach(v => {
+    const y = H - pad - ((v - minV) / (maxV - minV)) * (H - pad * 2);
+    gridLines += `<line x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}" stroke="#f0f0f0" stroke-width="1"/><text x="${pad-4}" y="${y+4}" font-size="9" fill="#9ca3af" text-anchor="end">${v}</text>`;
+  });
+
+  svg.innerHTML = `${gridLines}
+    <path d="${eeiPath}" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${volPath}" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8,4"/>
+    ${eeips.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="white" stroke="#4f46e5" stroke-width="2"/>`).join('')}
+    ${volps.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="white" stroke="#f59e0b" stroke-width="2"/>`).join('')}`;
+}
+
+// ==========================================
+// CONTENT TABLES
+// ==========================================
+function drawContentTables() {
+  const top = [
+    { title: 'CEO Vision 2025 Message', type: 'Leadership', channel: 'Email', ctr: '12.4%', delta: 'up' },
+    { title: 'Summer Party Save the Date', type: 'HR / Events', channel: 'Mobile Push', ctr: '11.8%', delta: 'up' },
+    { title: 'New Benefits Package', type: 'HR / Benefits', channel: 'Email', ctr: '10.2%', delta: 'up' },
+    { title: 'Safety Reminder — Factory', type: 'IT / Safety', channel: 'Popup PC', ctr: '9.8%', delta: 'neutral' },
+    { title: 'Monthly Results Digest', type: 'Performance', channel: 'Email', ctr: '8.9%', delta: 'up' },
+  ];
+  const flop = [
+    { title: 'Q2 Process Change v3.2', type: 'Operations', channel: 'Email', ctr: '1.2%', delta: 'down' },
+    { title: 'Policy Update — IT Security', type: 'IT / Compliance', channel: 'Email', ctr: '1.8%', delta: 'down' },
+    { title: 'Training Reminder #4', type: 'L&D', channel: 'Email', ctr: '2.1%', delta: 'down' },
+  ];
+
+  const thead = `<thead><tr><th>Content</th><th>Type</th><th>Channel</th><th>CTR</th></tr></thead>`;
+  document.getElementById('topContentTable').innerHTML = thead + '<tbody>' + top.map(r => `
+    <tr>
+      <td style="font-weight:500">${r.title}</td>
+      <td><span class="badge badge-type">${r.type}</span></td>
+      <td>${r.channel}</td>
+      <td><span class="badge badge-${r.delta}">${r.ctr}</span></td>
+    </tr>`).join('') + '</tbody>';
+
+  const fhead = `<thead><tr><th>Content</th><th>Type</th><th>Channel</th><th>CTR</th></tr></thead>`;
+  document.getElementById('flopContentTable').innerHTML = fhead + '<tbody>' + flop.map(r => `
+    <tr>
+      <td style="font-weight:500">${r.title}</td>
+      <td><span class="badge badge-type">${r.type}</span></td>
+      <td>${r.channel}</td>
+      <td><span class="badge badge-${r.delta}">${r.ctr}</span></td>
+    </tr>`).join('') + '</tbody>';
+}
+
+// ==========================================
+// CATEGORY BARS
+// ==========================================
+function drawCategoryBars() {
+  const container = document.getElementById('categoryBars');
+  const cats = [
+    { label: '👑 Leadership / CEO', eei: 84, color: '#4f46e5' },
+    { label: '👥 HR / Culture', eei: 79, color: '#10b981' },
+    { label: '🎉 Events / Social', eei: 76, color: '#f59e0b' },
+    { label: '📊 Performance / Results', eei: 71, color: '#06b6d4' },
+    { label: '🎓 Training / L&D', eei: 63, color: '#8b5cf6' },
+    { label: '🔧 IT / Compliance', eei: 51, color: '#ef4444' },
+    { label: '⚙ Operations / Process', eei: 44, color: '#dc2626' },
+  ];
+  container.innerHTML = `<div class="bar-chart">` + cats.map(c => `
+    <div class="bar-row">
+      <div class="bar-label" style="width:160px;text-align:right">${c.label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${c.eei}%;background:${c.color}">${c.eei}%</div>
+      </div>
+      <div class="bar-pct">${c.eei}%</div>
+    </div>`).join('') + `</div>`;
+}
+
+// ==========================================
+// CONTENT DONUT (VOLUME)
+// ==========================================
+function drawContentDonut() {
+  const svg = document.getElementById('contentDonut');
+  const cats = [
+    { label: 'HR / Culture', val: 28, color: '#10b981' },
+    { label: 'IT / Compliance', val: 22, color: '#3b82f6' },
+    { label: 'Leadership', val: 18, color: '#4f46e5' },
+    { label: 'Operations', val: 16, color: '#f59e0b' },
+    { label: 'Events', val: 10, color: '#ec4899' },
+    { label: 'L&D', val: 6, color: '#8b5cf6' },
+  ];
+  const total = cats.reduce((a, b) => a + b.val, 0);
+  let startAngle = -Math.PI / 2;
+  const cx = 90, cy = 90, r = 70, ir = 40;
+  let paths = '';
+  cats.forEach(seg => {
+    const angle = (seg.val / total) * 2 * Math.PI;
+    const endAngle = startAngle + angle;
+    const x1 = cx + r * Math.cos(startAngle), y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle), y2 = cy + r * Math.sin(endAngle);
+    const ix1 = cx + ir * Math.cos(startAngle), iy1 = cy + ir * Math.sin(startAngle);
+    const ix2 = cx + ir * Math.cos(endAngle), iy2 = cy + ir * Math.sin(endAngle);
+    const large = angle > Math.PI ? 1 : 0;
+    paths += `<path d="M ${ix1} ${iy1} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${large} 0 ${ix1} ${iy1}" fill="${seg.color}" opacity="0.85"/>`;
+    startAngle = endAngle;
+  });
+  let legend = '';
+  cats.forEach((c, i) => {
+    const lx = 200, ly = 20 + i * 26;
+    legend += `<rect x="${lx}" y="${ly}" width="12" height="12" fill="${c.color}" rx="3"/><text x="${lx+16}" y="${ly+10}" font-size="12" fill="#374151">${c.label} (${c.val}%)</text>`;
+  });
+  svg.innerHTML = `${paths}${legend}`;
+}
+
+// ==========================================
+// SEND TIMES
+// ==========================================
+function drawSendTimes() {
+  const container = document.getElementById('sendTimes');
+  const times = [
+    { day: 'Tuesday 9–11am', score: 92, label: 'Best' },
+    { day: 'Wednesday 9–11am', score: 85, label: 'Great' },
+    { day: 'Monday 10am–12pm', score: 78, label: 'Good' },
+    { day: 'Thursday 2–4pm', score: 62, label: 'Average' },
+    { day: 'Friday 4–6pm', score: 34, label: 'Avoid' },
+  ];
+  container.innerHTML = times.map(t => {
+    const color = t.score > 80 ? 'var(--success)' : t.score > 60 ? 'var(--warning)' : 'var(--danger)';
+    return `<div style="display:flex;align-items:center;gap:12px;background:#f9fafb;border-radius:8px;padding:10px 14px">
+      <div style="width:160px;font-size:12px;font-weight:500">${t.day}</div>
+      <div class="mini-bar" style="flex:1;height:10px"><div class="mini-bar-fill" style="width:${t.score}%;background:${color}"></div></div>
+      <div style="width:60px;text-align:right;font-size:12px;font-weight:700;color:${color}">${t.label}</div>
+    </div>`;
+  }).join('');
+}
+
+// ==========================================
+// DEPT HEATMAP
+// ==========================================
+function drawDeptHeatmap() {
+  const container = document.getElementById('deptHeatmap');
+  const metrics = ['Email', 'SMS', 'Popup', 'Push'];
+  const depts = [
+    { name: 'Sales', scores: [78, 94, 91, 82] },
+    { name: 'Marketing', scores: [82, 88, 95, 91] },
+    { name: 'IT', scores: [71, 72, 98, 69] },
+    { name: 'Operations', scores: [44, 67, 88, 51] },
+    { name: 'HR', scores: [88, 91, 93, 87] },
+    { name: 'Finance', scores: [65, 76, 89, 61] },
+  ];
+
+  function heatColor(v) {
+    if (v >= 80) return '#10b981';
+    if (v >= 60) return '#f59e0b';
+    return '#ef4444';
+  }
+
+  let html = `<div class="heatmap-grid">
+    <div class="heatmap-header" style="text-align:left">Dept.</div>
+    ${metrics.map(m => `<div class="heatmap-header">${m}</div>`).join('')}
+  `;
+  depts.forEach(d => {
+    html += `<div class="heatmap-row-label">${d.name}</div>`;
+    d.scores.forEach(s => {
+      html += `<div class="heatmap-cell" style="background:${heatColor(s)};opacity:${0.5 + s/200}">${s}%</div>`;
+    });
+  });
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+// ==========================================
+// DEPT BARS
+// ==========================================
+function drawDeptBars() {
+  const container = document.getElementById('deptBars');
+  const depts = [
+    { name: 'HR', score: 88, color: '#10b981' },
+    { name: 'Marketing', score: 84, color: '#10b981' },
+    { name: 'Sales', score: 81, color: '#10b981' },
+    { name: 'IT', score: 73, color: '#f59e0b' },
+    { name: 'Finance', score: 68, color: '#f59e0b' },
+    { name: 'Operations', score: 48, color: '#ef4444' },
+  ];
+  container.innerHTML = `<div class="bar-chart">` + depts.map(d => `
+    <div class="bar-row">
+      <div class="bar-label">${d.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${d.score}%;background:${d.color}">${d.score}%</div>
+      </div>
+      <div class="bar-pct">${d.score}%</div>
+    </div>`).join('') + `</div>`;
+}
+
+// ==========================================
+// TURNOVER TABLE
+// ==========================================
+function drawTurnoverTable() {
+  const container = document.getElementById('turnoverTable');
+  const rows = [
+    { dept: 'HR', ctr: '↑ +12%', turnover: '3.1%', risk: 'Low', badge: 'up' },
+    { dept: 'Marketing', ctr: '↑ +8%', turnover: '4.2%', risk: 'Low', badge: 'up' },
+    { dept: 'Sales', ctr: '→ 0%', turnover: '8.1%', risk: 'Medium', badge: 'neutral' },
+    { dept: 'IT', ctr: '↓ -5%', turnover: '9.4%', risk: 'Medium', badge: 'neutral' },
+    { dept: 'Finance', ctr: '↓ -9%', turnover: '11.2%', risk: 'Elevated', badge: 'down' },
+    { dept: 'Operations', ctr: '↓ -18%', turnover: '14.8%', risk: 'High ⚠', badge: 'down' },
+  ];
+  container.innerHTML = `<thead><tr><th>Department</th><th>CTR Change (M/M)</th><th>Voluntary Turnover</th><th>Retention Risk</th></tr></thead><tbody>` +
+    rows.map(r => `<tr>
+      <td style="font-weight:600">${r.dept}</td>
+      <td><span class="badge badge-${r.badge}">${r.ctr}</span></td>
+      <td>${r.turnover}</td>
+      <td><span class="badge badge-${r.badge}">${r.risk}</span></td>
+    </tr>`).join('') + `</tbody>`;
+}
+
+// ==========================================
+// GEO BARS
+// ==========================================
+function drawGeoBars() {
+  const container = document.getElementById('geoBars');
+  const geos = [
+    { name: 'Paris HQ', score: 81, color: '#10b981' },
+    { name: 'Lyon', score: 52, color: '#ef4444' },
+    { name: 'Bordeaux', score: 74, color: '#f59e0b' },
+    { name: 'Marseille', score: 48, color: '#ef4444' },
+    { name: 'Nantes', score: 77, color: '#10b981' },
+    { name: 'Remote', score: 69, color: '#f59e0b' },
+  ];
+  container.innerHTML = `<div class="bar-chart">` + geos.map(d => `
+    <div class="bar-row">
+      <div class="bar-label">📍 ${d.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${d.score}%;background:${d.color}">${d.score}%</div>
+      </div>
+      <div class="bar-pct">${d.score}%</div>
+    </div>`).join('') + `</div>`;
+}
+
+// ==========================================
+// PROFILE BARS
+// ==========================================
+function drawProfileBars() {
+  const container = document.getElementById('profileBars');
+  const profiles = [
+    { name: '🖥 Office Workers', score: 79, channel: 'Email + Popup', color: '#4f46e5' },
+    { name: '🏭 Factory / Field Workers', score: 76, channel: 'SMS', color: '#10b981' },
+    { name: '🚗 Remote Employees', score: 71, channel: 'Mobile Push', color: '#f59e0b' },
+    { name: '👔 Management / Executives', score: 83, channel: 'Email + Push', color: '#8b5cf6' },
+    { name: '🆕 New Employees (&lt;6mo)', score: 61, channel: 'All channels', color: '#06b6d4' },
+  ];
+  container.innerHTML = `<div class="bar-chart">` + profiles.map(d => `
+    <div class="bar-row">
+      <div class="bar-label" style="width:200px;text-align:right;font-size:12px">${d.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${d.score}%;background:${d.color}">${d.score}% — Best: ${d.channel}</div>
+      </div>
+      <div class="bar-pct">${d.score}%</div>
+    </div>`).join('') + `</div>`;
+}
+
+// ==========================================
+// KRR BARS
+// ==========================================
+function drawKrrBars() {
+  const container = document.getElementById('krrBars');
+  const data = [
+    { month: 'Jan', val: 74, color: '#f59e0b' },
+    { month: 'Feb', val: 68, color: '#ef4444' },
+    { month: 'Mar', val: 76, color: '#f59e0b' },
+    { month: 'Apr', val: 79, color: '#10b981' },
+    { month: 'May', val: 81, color: '#10b981' },
+    { month: 'Jun', val: 83, color: '#10b981' },
+  ];
+  container.innerHTML = data.map(d => `
+    <div class="krr-bar-row">
+      <div class="krr-month">${d.month}</div>
+      <div class="krr-track">
+        <div class="krr-fill" style="width:${d.val}%;background:${d.color}">${d.val}%</div>
+      </div>
+      <div class="krr-label" style="color:${d.color}">${d.val}%</div>
+    </div>`).join('');
+}
+
+// ==========================================
+// CALCULATORS
+// ==========================================
+function calcEEI() {
+  const views = parseInt(document.getElementById('simViews').value);
+  const clicks = parseInt(document.getElementById('simClicks').value);
+  const surveys = parseInt(document.getElementById('simSurveys').value);
+  const headcount = parseInt(document.getElementById('simHeadcount').value);
+  document.getElementById('simViewsVal').textContent = views;
+  document.getElementById('simClicksVal').textContent = clicks;
+  document.getElementById('simSurveysVal').textContent = surveys;
+  document.getElementById('simHeadcountVal').textContent = headcount;
+  const maxWeight = 5;
+  const eei = ((views * 1 + clicks * 3 + surveys * 5) / (headcount * maxWeight)) * 100;
+  const val = Math.min(100, eei).toFixed(1);
+  document.getElementById('eeiResultVal').textContent = val;
+  let status = '', color = 'var(--primary)';
+  if (eei >= 70) { status = '🌟 Excellent — Target achieved!'; color = 'var(--success)'; }
+  else if (eei >= 50) { status = '✅ Good — Close to target'; color = 'var(--warning)'; }
+  else { status = '⚠ Needs improvement'; color = 'var(--danger)'; }
+  document.getElementById('eeiResultVal').style.color = color;
+  document.getElementById('eeiResultStatus').innerHTML = `<span style="color:${color}">${status}</span>`;
+  document.getElementById('eeiResult').style.background = eei >= 70 ? 'var(--success-light)' : eei >= 50 ? 'var(--warning-light)' : 'var(--danger-light)';
+}
+
+function calcNPS() {
+  const p = parseInt(document.getElementById('npsPromoters').value);
+  const pa = parseInt(document.getElementById('npsPassives').value);
+  const d = parseInt(document.getElementById('npsDetractors').value);
+  document.getElementById('npsPromotersVal').textContent = p + '%';
+  document.getElementById('npsPassivesVal').textContent = pa + '%';
+  document.getElementById('npsDetractorsVal').textContent = d + '%';
+  const nps = p - d;
+  document.getElementById('npsResultVal').textContent = (nps > 0 ? '+' : '') + nps;
+  let status = '', color = 'var(--danger)';
+  if (nps >= 30) { status = '🌟 Excellent — Above +30 threshold'; color = 'var(--success)'; }
+  else if (nps >= 0) { status = '✅ Positive — Room for improvement'; color = 'var(--warning)'; }
+  else { status = '🚨 Alert — Negative eNPS'; color = 'var(--danger)'; }
+  document.getElementById('npsResultVal').style.color = color;
+  document.getElementById('npsResultStatus').innerHTML = `<span style="color:${color}">${status}</span>`;
+  document.getElementById('npsResult').style.background = nps >= 30 ? 'var(--success-light)' : nps >= 0 ? 'var(--warning-light)' : 'var(--danger-light)';
+}
+
+function calcSurvey() {
+  const recv = parseInt(document.getElementById('survRecipients').value);
+  const resp = Math.min(parseInt(document.getElementById('survRespondents').value), recv);
+  document.getElementById('survRecipientsVal').textContent = recv;
+  document.getElementById('survRespondentsVal').textContent = resp;
+  const rate = ((resp / recv) * 100).toFixed(0);
+  document.getElementById('surveyResultVal').textContent = rate + '%';
+  let status = '', color = 'var(--danger)', bg = 'var(--danger-light)';
+  if (rate >= 70) { status = '🌟 Excellence achieved — Above 70% target!'; color = 'var(--success)'; bg = 'var(--success-light)'; }
+  else if (rate >= 40) { status = `⚠ Near target — ${70 - rate} points below the 70% excellence standard`; color = 'var(--warning)'; bg = 'var(--warning-light)'; }
+  else { status = '🚨 Alert — Critically low participation'; }
+  document.getElementById('surveyResultVal').style.color = color;
+  document.getElementById('surveyResultStatus').innerHTML = `<span style="color:${color}">${status}</span>`;
+  document.getElementById('surveyResult').style.background = bg;
+}
+
+// ==========================================
+// EXPORT PDF (PRINT)
+// ==========================================
+function exportPDF() {
+  alert('In a production environment, this would generate a structured PDF report using a library like jsPDF or Puppeteer.\n\nFor this prototype, the browser print dialog will open — use "Save as PDF" to export.');
+  setTimeout(() => window.print(), 500);
+}
+
+// ==========================================
+// INIT
+// ==========================================
+window.addEventListener('DOMContentLoaded', () => {
+  drawTrendChart();
+  drawChannelSummaryBars();
+  drawBenchmarkBars();
+  drawChannelCompareBars();
+  drawSmileDonut(62, 14, 24);
+  drawEnpsChart();
+  drawESIBars();
+  drawStarDistribution();
+  drawContentTables();
+  drawCategoryBars();
+  drawContentDonut();
+  drawSendTimes();
+  drawDeptHeatmap();
+  drawDeptBars();
+  drawTurnoverTable();
+  drawGeoBars();
+  drawProfileBars();
+  drawKrrBars();
+  drawVolumeEngagementChart();
+  calcEEI();
+  calcNPS();
+  calcSurvey();
+});
+</script>
+</body>
+</html>
