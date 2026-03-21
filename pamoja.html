@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pamoja — The Impact of Unity | Gakundi Memorial Foundation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold-primary: #E8A820;
+            --gold-dark: #C9860A;
+            --gold-light: #F5C642;
+            --gold-subtle: rgba(232, 168, 32, 0.15);
+            --navy-dark: #0D1B2A;
+            --navy-mid: #1A2E44;
+            --navy-light: #243B55;
+            --white: #FFFFFF;
+            --text-muted: #A8B8CC;
+            --red: #E85A4F;
+            --green: #4CAF50;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--navy-dark);
+            color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+        }
+
+        .section {
+            padding: 80px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+            margin: 40px 0;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: var(--navy-dark);
+            overflow: hidden;
+            padding: 60px 20px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(232, 168, 32, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(232, 168, 32, 0.03) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: float 15s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-100px) translateX(50px); }
+        }
+
+        .logo {
+            width: 200px;
+            height: 200px;
+            filter: drop-shadow(0 0 30px var(--gold-primary));
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+            animation: logoFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            letter-spacing: 8px;
+            position: relative;
+            z-index: 1;
+            font-weight: 800;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+            font-weight: 400;
+        }
+
+        .hero-meta {
+            color: var(--gold-primary);
+            font-size: 1rem;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 1;
+            font-weight: 400;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--gold-primary);
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .hero-stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(20px); }
+        }
+
+        .scroll-arrow {
+            width: 30px;
+            height: 30px;
+            border-left: 3px solid var(--gold-primary);
+            border-bottom: 3px solid var(--gold-primary);
+            transform: rotate(-45deg);
+        }
+
+        /* Chaos Section - COMPACT REDESIGN */
+        .chaos-section {
+            background: linear-gradient(180deg, var(--navy-dark) 0%, rgba(232, 90, 79, 0.1) 50%, var(--navy-dark) 100%);
+            padding: 48px 20px !important;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 400;
+        }
+
+        /* Chaos Chips - Compact horizontal wrap */
+        .chaos-wall {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 28px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .chaos-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(232, 90, 79, 0.12);
+            border: 1px solid rgba(232, 90, 79, 0.35);
+            border-radius: 26px;
+            min-width: 160px;
+            height: 52px;
+            opacity: 0;
+            animation: chaosAppear 0.6s forwards;
+            transition: all 0.3s ease;
+        }
+
+        .chaos-chip:hover {
+            box-shadow: 0 0 15px rgba(232, 90, 79, 0.4);
+            transform: translateY(-2px);
+        }
+
+        @keyframes chaosAppear {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .chaos-chip:nth-child(1) { animation-delay: 0.1s; transform: rotate(-2deg); }
+        .chaos-chip:nth-child(2) { animation-delay: 0.15s; transform: rotate(3deg); }
+        .chaos-chip:nth-child(3) { animation-delay: 0.2s; transform: rotate(-3deg); }
+        .chaos-chip:nth-child(4) { animation-delay: 0.25s; transform: rotate(2deg); }
+        .chaos-chip:nth-child(5) { animation-delay: 0.3s; transform: rotate(-2deg); }
+        .chaos-chip:nth-child(6) { animation-delay: 0.35s; transform: rotate(3deg); }
+        .chaos-chip:nth-child(7) { animation-delay: 0.4s; transform: rotate(-3deg); }
+        .chaos-chip:nth-child(8) { animation-delay: 0.45s; transform: rotate(2deg); }
+
+        .chaos-chip-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .chaos-chip-label {
+            font-size: 13px;
+            color: var(--white);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Pain Points - Compact 4-column grid */
+        .pain-points {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 28px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (max-width: 1024px) {
+            .pain-points {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .pain-points {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pain-card {
+            background: rgba(232, 90, 79, 0.08);
+            border: 1px solid rgba(232, 90, 79, 0.4);
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .pain-number {
+            font-size: 32px;
+            color: var(--red);
+            font-weight: 800;
+            margin-bottom: 8px;
+            font-family: 'Nunito', sans-serif;
+            line-height: 1;
+        }
+
+        .pain-label {
+            font-size: 13px;
+            color: var(--white);
+            margin-bottom: 4px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .pain-detail {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            min-height: 400px;
+            width: 100%;
+            margin: 40px 0;
+        }
+
+        .chart-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 968px) {
+            .chart-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Pamoja Section */
+        .pamoja-section {
+            background: linear-gradient(180deg, var(--navy-dark) 0%, rgba(232, 168, 32, 0.1) 50%, var(--navy-dark) 100%);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(232, 168, 32, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(232, 168, 32, 0.3);
+            border-color: var(--gold-primary);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Transformation Section */
+        .time-saved-card {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary));
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            margin: 40px auto;
+            max-width: 600px;
+        }
+
+        .time-saved-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .time-saved-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--navy-dark);
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .time-saved-label {
+            font-size: 1.2rem;
+            color: var(--navy-dark);
+            font-weight: 700;
+        }
+
+        /* Impact Metrics */
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .impact-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid var(--gold-primary);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .impact-number {
+            font-size: 3.5rem;
+            color: var(--gold-primary);
+            font-weight: 800;
+            margin-bottom: 10px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .impact-label {
+            font-size: 1.1rem;
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* Stakeholder Section */
+        .stakeholder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin: 60px 0;
+        }
+
+        .stakeholder-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(232, 168, 32, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+        }
+
+        .stakeholder-title {
+            font-size: 1.5rem;
+            color: var(--gold-primary);
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .stakeholder-item {
+            margin-bottom: 25px;
+        }
+
+        .stakeholder-label {
+            font-size: 0.85rem;
+            color: var(--gold-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .stakeholder-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Quote Wall */
+        .quote-wall {
+            background: var(--navy-mid);
+            padding: 80px 20px;
+        }
+
+        .quote {
+            max-width: 900px;
+            margin: 0 auto 60px;
+            text-align: center;
+        }
+
+        .quote:last-child {
+            margin-bottom: 0;
+        }
+
+        .quote-text {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            font-style: italic;
+            color: var(--white);
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 400;
+        }
+
+        .quote-author {
+            font-size: 1rem;
+            color: var(--gold-primary);
+            font-weight: 700;
+        }
+
+        /* Final Section */
+        .final-section {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(180deg, var(--navy-dark) 0%, var(--navy-mid) 100%);
+        }
+
+        .final-logo {
+            width: 250px;
+            height: 250px;
+            filter: drop-shadow(0 0 50px var(--gold-primary));
+            margin: 0 auto 40px;
+        }
+
+        .final-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .final-text {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        .footer {
+            color: var(--gold-primary);
+            font-size: 0.9rem;
+            margin-top: 60px;
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding: 40px 20px;
+            }
+
+            .chaos-section {
+                padding: 40px 20px !important;
+            }
+
+            .hero-stats {
+                gap: 30px;
+            }
+
+            .hero-stat-number {
+                font-size: 2.5rem;
+            }
+
+            .chaos-wall {
+                gap: 8px;
+            }
+
+            .chaos-chip {
+                min-width: 140px;
+                height: 48px;
+                padding: 10px 16px;
+            }
+
+            .chaos-chip-label {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="particles">
+            <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+            <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+            <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+            <div class="particle" style="left: 40%; animation-delay: 1s;"></div>
+            <div class="particle" style="left: 50%; animation-delay: 3s;"></div>
+            <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+            <div class="particle" style="left: 70%; animation-delay: 2.5s;"></div>
+            <div class="particle" style="left: 80%; animation-delay: 4.5s;"></div>
+            <div class="particle" style="left: 90%; animation-delay: 1.5s;"></div>
+        </div>
+        <img src="https://www.genspark.ai/api/files/s/mnbrZ2sI" alt="Pamoja Logo" class="logo">
+        <h1 class="hero-title">PAMOJA</h1>
+        <p class="hero-subtitle">Swahili for 'Together' — One Portal. One Mission. Infinite Impact.</p>
+        <p class="hero-meta">Gakundi Memorial Foundation · Kenya · 12 Years of Impact</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-number" data-count="123">0</div>
+                <div class="hero-stat-label">Active Students</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-number" data-count="47">0</div>
+                <div class="hero-stat-label">Partner Schools</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-number" data-count="8">0</div>
+                <div class="hero-stat-label">Counties Reached</div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Chaos Section - COMPACT REDESIGN -->
+    <section class="section chaos-section">
+        <h2 class="section-title">Life Before Pamoja</h2>
+        <p class="section-subtitle">Every day, your mission competes with your administration.</p>
+        
+        <div class="chaos-wall">
+            <div class="chaos-chip">
+                <span class="chaos-chip-icon">📁</span>
+                <span class="chaos-chip-label">Drive Folders</span>
+            </div>
+            <div class="chaos-chip">
+                <span class="chaos-chip-icon">📊</span>
+                <span class="chaos-chip-label">Excel Sheets</span>
+            </div>
+            <div class="chaos-chip">
+                <span class="chaos-chip-icon">📋</span>
+                <span class="chaos-chip-label">Paper Forms</span>
+            </div>
+            <div class="chaos-chip">
+                <span class="chaos-chip-icon">📧</span>
+                <span class="chaos-chip-label">Email Chains</span>
+            </div>
+            <div class="chaos-chip">
+                <span class="chaos-chip-icon">🗂️</span>
+                <span class="chaos-chip-label">Filing Cabinets</span>
+            </div>
+            <div class="chaos-chip">
+                <span class="chaos-chip-icon">❓</span>
+                <span class="chaos-chip-label">Missing Data</span>
+            </div>
+            <div class="chaos-chip">
+                <span class="chaos-chip-icon">📞</span>
+                <span class="chaos-chip-label">Phone Follow-ups</span>
+            </div>
+            <div class="chaos-chip">
+                <span class="chaos-chip-icon">🖨️</span>
+                <span class="chaos-chip-label">Printed Reports</span>
+            </div>
+        </div>
+
+        <div class="pain-points">
+            <div class="pain-card">
+                <div class="pain-number">½ Day</div>
+                <div class="pain-label">Per Sponsor Report</div>
+                <div class="pain-detail">×40+ sponsors = weeks/year</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-number">20+ Min</div>
+                <div class="pain-label">To Find Student History</div>
+                <div class="pain-detail">Manual folder hunting</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-number">Quarterly</div>
+                <div class="pain-label">Programme Overview</div>
+                <div class="pain-detail">Only available quarterly</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-number">~0</div>
+                <div class="pain-label">At-Risk Students Flagged</div>
+                <div class="pain-detail">Before crisis occurs</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Time Theft Section -->
+    <section class="section">
+        <h2 class="section-title">Where Did the Mission Time Go?</h2>
+        <p class="section-subtitle">Before Pamoja: A team member's week lost to administration</p>
+        
+        <div class="chart-wrapper">
+            <div class="chart-container" id="stackedBarChart"></div>
+            <div class="chart-container" id="donutChart"></div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Pamoja Section -->
+    <section class="section pamoja-section">
+        <h2 class="section-title">Life With Pamoja</h2>
+        <p class="section-subtitle">One portal. Everyone together. Mission first.</p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Live Impact Dashboard</div>
+                <div class="feature-desc">All metrics updated in real-time. No manual refresh.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👤</div>
+                <div class="feature-title">Complete Digital Profiles</div>
+                <div class="feature-desc">Full student history. One click. Any device.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-title">AI Performance Analysis</div>
+                <div class="feature-desc">At-risk students flagged early. High performers spotlighted.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <div class="feature-title">Living Partnership Deck</div>
+                <div class="feature-desc">Always-current sponsor updates. Share with a single link.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Unified Data</div>
+                <div class="feature-desc">Donors, students, schools. One source of truth.</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Transformation Section -->
+    <section class="section">
+        <h2 class="section-title">The Transformation</h2>
+        <p class="section-subtitle">Days of irrelevant work → Time spent on mission</p>
+        
+        <div class="chart-container" id="transformationChart"></div>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 10px;">
+            * Programme overview and At-risk flagging shown as equivalent minutes for comparison
+        </p>
+
+        <div class="time-saved-card">
+            <div class="time-saved-icon">⏰</div>
+            <div class="time-saved-number" data-count="156">0</div>
+            <div class="time-saved-label">Hours Returned to Mission Every Year</div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Impact Metrics Section -->
+    <section class="section">
+        <h2 class="section-title">The Outcome: Students Who Excel</h2>
+        
+        <div class="impact-grid">
+            <div class="impact-card">
+                <div class="impact-number" data-count="4.25">0</div>
+                <div class="impact-label">× National Average Grades</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-number" data-count="63">0</div>
+                <div class="impact-label">% Girls Supported</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-number" data-count="100">0</div>
+                <div class="impact-label">% Fee Coverage</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-number" data-count="95">0</div>
+                <div class="impact-label">% Less Time on Reports</div>
+            </div>
+        </div>
+
+        <div class="chart-container" id="radarChart"></div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Stakeholder Section -->
+    <section class="section">
+        <h2 class="section-title">Everyone Is Together — That's What Pamoja Means</h2>
+        
+        <div class="stakeholder-grid">
+            <div class="stakeholder-card">
+                <div class="stakeholder-title">DONORS / SPONSORS</div>
+                <div class="stakeholder-item">
+                    <div class="stakeholder-label">Before</div>
+                    <div class="stakeholder-text">Waiting weeks for fragmented updates. Uncertain about impact.</div>
+                </div>
+                <div class="stakeholder-item">
+                    <div class="stakeholder-label">After</div>
+                    <div class="stakeholder-text">A single link shows live student progress. Trust built instantly.</div>
+                </div>
+            </div>
+            
+            <div class="stakeholder-card">
+                <div class="stakeholder-title">STUDENTS</div>
+                <div class="stakeholder-item">
+                    <div class="stakeholder-label">Before</div>
+                    <div class="stakeholder-text">History scattered. Support delayed. At-risk flags missed.</div>
+                </div>
+                <div class="stakeholder-item">
+                    <div class="stakeholder-label">After</div>
+                    <div class="stakeholder-text">Seen, tracked, supported early. 'Gakundi Memorial Foundation changed the way I see myself.'</div>
+                </div>
+            </div>
+            
+            <div class="stakeholder-card">
+                <div class="stakeholder-title">FOUNDATION STAFF</div>
+                <div class="stakeholder-item">
+                    <div class="stakeholder-label">Before</div>
+                    <div class="stakeholder-text">Drowning in admin. Knowledge lives in people, not systems.</div>
+                </div>
+                <div class="stakeholder-item">
+                    <div class="stakeholder-label">After</div>
+                    <div class="stakeholder-text">Free to visit schools, build relationships, grow the programme.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Quote Wall -->
+    <div class="quote-wall">
+        <div class="quote">
+            <p class="quote-text">"Every hour spent managing files was an hour not spent talking to a student, visiting a school, or building a relationship with a sponsor."</p>
+            <p class="quote-author">— Gakundi Memorial Foundation</p>
+        </div>
+        <div class="quote">
+            <p class="quote-text">"I want to raise my parents' background and help children who cannot afford school."</p>
+            <p class="quote-author">— Gakundi Memorial Foundation Student</p>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Final Section -->
+    <section class="final-section">
+        <img src="https://www.genspark.ai/api/files/s/mnbrZ2sI" alt="Pamoja Logo" class="final-logo">
+        <h2 class="final-title">Together, We Multiply Impact</h2>
+        <p class="final-text">Pamoja is not just a portal. It is how Gakundi Memorial Foundation honours every student, every donor, every dream.</p>
+        <div class="footer">Gakundi Memorial Foundation · mygalago.ai · Powered by MyGalago AI Platform</div>
+    </section>
+
+    <script>
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Counter animation
+        function animateCounter(element) {
+            const target = parseFloat(element.getAttribute('data-count'));
+            const duration = 2000;
+            const step = target / (duration / 16);
+            let current = 0;
+            const isDecimal = target % 1 !== 0;
+
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    element.textContent = isDecimal ? target.toFixed(2) : Math.round(target);
+                    clearInterval(timer);
+                } else {
+                    element.textContent = isDecimal ? current.toFixed(2) : Math.round(current);
+                }
+            }, 16);
+        }
+
+        // Counter observer
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.target.textContent === '0') {
+                    animateCounter(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('[data-count]').forEach(counter => {
+            counterObserver.observe(counter);
+        });
+
+        // Stacked Bar Chart
+        const stackedBarChart = echarts.init(document.getElementById('stackedBarChart'));
+        const stackedBarOption = {
+            backgroundColor: 'transparent',
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                backgroundColor: 'rgba(26, 46, 68, 0.9)',
+                borderColor: '#E8A820',
+                textStyle: {
+                    color: '#FFFFFF',
+                    fontFamily: 'Nunito'
+                }
+            },
+            legend: {
+                data: ['Admin/Wasted Time', 'Could Be Mission'],
+                textStyle: {
+                    color: '#A8B8CC',
+                    fontFamily: 'Nunito'
+                },
+                top: 0
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                max: 100,
+                axisLabel: {
+                    formatter: '{value}%',
+                    color: '#A8B8CC',
+                    fontFamily: 'Nunito'
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#243B55'
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#243B55'
+                    }
+                }
+            },
+            yAxis: {
+                type: 'category',
+                data: ['Sponsor\nReporting', 'Student\nFile Search', 'Programme\nOverview', 'At-Risk\nIdentification', 'Sharing\nImpact'],
+                axisLabel: {
+                    color: '#A8B8CC',
+                    fontFamily: 'Nunito'
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#243B55'
+                    }
+                }
+            },
+            series: [
+                {
+                    name: 'Admin/Wasted Time',
+                    type: 'bar',
+                    stack: 'total',
+                    itemStyle: {
+                        color: '#E85A4F'
+                    },
+                    data: [35, 40, 50, 30, 45]
+                },
+                {
+                    name: 'Could Be Mission',
+                    type: 'bar',
+                    stack: 'total',
+                    itemStyle: {
+                        color: '#243B55'
+                    },
+                    data: [65, 60, 50, 70, 55]
+                }
+            ]
+        };
+        stackedBarChart.setOption(stackedBarOption);
+
+        // Donut Chart
+        const donutChart = echarts.init(document.getElementById('donutChart'));
+        const donutOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: '42% of team capacity\nlost to administration',
+                left: 'center',
+                top: 'center',
+                textStyle: {
+                    color: '#FFFFFF',
+                    fontSize: 14,
+                    fontWeight: 'normal',
+                    lineHeight: 20,
+                    fontFamily: 'Nunito'
+                }
+            },
+            tooltip: {
+                trigger: 'item',
+                backgroundColor: 'rgba(26, 46, 68, 0.9)',
+                borderColor: '#E8A820',
+                textStyle: {
+                    color: '#FFFFFF',
+                    fontFamily: 'Nunito'
+                }
+            },
+            legend: {
+                orient: 'vertical',
+                right: 20,
+                top: 'center',
+                textStyle: {
+                    color: '#A8B8CC',
+                    fontFamily: 'Nunito'
+                }
+            },
+            series: [
+                {
+                    type: 'pie',
+                    radius: ['50%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#0D1B2A',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: false
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 20,
+                            fontWeight: 'bold',
+                            color: '#FFFFFF',
+                            fontFamily: 'Nunito'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: [
+                        { 
+                            value: 42, 
+                            name: 'Admin Overhead',
+                            itemStyle: {
+                                color: '#E85A4F'
+                            }
+                        },
+                        { 
+                            value: 58, 
+                            name: 'Mission Time',
+                            itemStyle: {
+                                color: '#E8A820'
+                            }
+                        }
+                    ]
+                }
+            ]
+        };
+        donutChart.setOption(donutOption);
+
+        // Transformation Chart
+        const transformationChart = echarts.init(document.getElementById('transformationChart'));
+        const transformationOption = {
+            backgroundColor: 'transparent',
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                backgroundColor: 'rgba(26, 46, 68, 0.9)',
+                borderColor: '#E8A820',
+                textStyle: {
+                    color: '#FFFFFF',
+                    fontFamily: 'Nunito'
+                },
+                formatter: function(params) {
+                    let result = params[0].name + '<br/>';
+                    params.forEach(item => {
+                        result += item.marker + item.seriesName + ': ' + item.value + ' min<br/>';
+                    });
+                    return result;
+                }
+            },
+            legend: {
+                data: ['Before', 'After'],
+                textStyle: {
+                    color: '#A8B8CC',
+                    fontFamily: 'Nunito'
+                },
+                top: 0
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Sponsor\nReport', 'Student\nHistory', 'Programme\nOverview*', 'At-Risk\nFlag*', 'Sharing\nImpact'],
+                axisLabel: {
+                    color: '#A8B8CC',
+                    interval: 0,
+                    fontFamily: 'Nunito'
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#243B55'
+                    }
+                }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Minutes',
+                nameTextStyle: {
+                    color: '#A8B8CC',
+                    fontFamily: 'Nunito'
+                },
+                axisLabel: {
+                    color: '#A8B8CC',
+                    fontFamily: 'Nunito'
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#243B55'
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#243B55'
+                    }
+                }
+            },
+            series: [
+                {
+                    name: 'Before',
+                    type: 'bar',
+                    itemStyle: {
+                        color: '#E85A4F'
+                    },
+                    data: [240, 20, 7200, 129600, 480]
+                },
+                {
+                    name: 'After',
+                    type: 'bar',
+                    itemStyle: {
+                        color: '#E8A820'
+                    },
+                    data: [5, 1, 0, 0, 2]
+                }
+            ]
+        };
+        transformationChart.setOption(transformationOption);
+
+        // Radar Chart
+        const radarChart = echarts.init(document.getElementById('radarChart'));
+        const radarOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: 'Programme Health Score',
+                left: 'center',
+                textStyle: {
+                    color: '#E8A820',
+                    fontSize: 24,
+                    fontFamily: 'Nunito',
+                    fontWeight: 800
+                }
+            },
+            tooltip: {
+                trigger: 'item',
+                backgroundColor: 'rgba(26, 46, 68, 0.9)',
+                borderColor: '#E8A820',
+                textStyle: {
+                    color: '#FFFFFF',
+                    fontFamily: 'Nunito'
+                }
+            },
+            radar: {
+                indicator: [
+                    { name: 'Academic\nPerformance', max: 100 },
+                    { name: 'Gender\nEquity', max: 100 },
+                    { name: 'School\nPartnership', max: 100 },
+                    { name: 'Donor\nEngagement', max: 100 },
+                    { name: 'Early Risk\nDetection', max: 100 },
+                    { name: 'Data\nAccessibility', max: 100 }
+                ],
+                shape: 'polygon',
+                splitNumber: 5,
+                axisName: {
+                    color: '#A8B8CC',
+                    fontSize: 12,
+                    fontFamily: 'Nunito'
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#243B55'
+                    }
+                },
+                splitArea: {
+                    show: true,
+                    areaStyle: {
+                        color: ['rgba(232, 168, 32, 0.05)', 'rgba(232, 168, 32, 0.1)']
+                    }
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#243B55'
+                    }
+                }
+            },
+            series: [{
+                type: 'radar',
+                data: [
+                    {
+                        value: [92, 90, 85, 88, 78, 95],
+                        name: 'Gakundi Memorial Foundation Performance',
+                        areaStyle: {
+                            color: 'rgba(232, 168, 32, 0.3)'
+                        },
+                        lineStyle: {
+                            color: '#E8A820',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#E8A820'
+                        }
+                    }
+                ]
+            }]
+        };
+        radarChart.setOption(radarOption);
+
+        // Resize charts on window resize
+        window.addEventListener('resize', () => {
+            stackedBarChart.resize();
+            donutChart.resize();
+            transformationChart.resize();
+            radarChart.resize();
+        });
+    </script>
+</body>
+</html>
